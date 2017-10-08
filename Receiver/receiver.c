@@ -25,8 +25,7 @@ unsigned char redMode_cmd[9] = {0x01,0x42,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
 int main(){
 
-	lcd_init();
-	lcd_string("START");
+	//lcd_init();
 	radio_hardware_init();
 
 	EICRA = (1<<ISC01)|(0<<ISC00);	// Set external interupt on falling edge for INT0 and INT1
@@ -36,7 +35,7 @@ int main(){
     spi_init();
 	spi_radio_config();	
 
-	DDRD |= (1<<PD3);
+	DDRC |= (1<<PC5);
 
     _delay_ms(50);
 	sei();
@@ -52,11 +51,10 @@ int main(){
 			//display(payload,PAYLOAD_WIDTH,1);
 			
 			if(payload[4]==0xBF){
-				PORTD |= (1<<PD3);
+				PORTC |= (1<<PC5);
 			}else{
-				PORTD &= ~(1<<PD3);
+				PORTC &= ~(1<<PC5);
 			}
-			display(payload,PAYLOAD_WIDTH,2);
 /*
 			strncpy(ps2_data,payload,9);
 			if(ps2_x_pressed()){

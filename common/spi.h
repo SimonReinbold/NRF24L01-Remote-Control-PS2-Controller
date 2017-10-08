@@ -11,7 +11,7 @@
 #define SCK_PIN PB5		// 13
 #define MISO_PIN PB4	// 12
 #define MOSI_PIN PB3	// 11
-#define SS_PS2_PIN PD4 		// 10
+#define SS_PS2_PIN PB2 		// 10
 #define CSN PB1
 
 void spi_init( void );

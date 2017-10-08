@@ -13,11 +13,9 @@ void spi_init(){
 	SPI_REG &= ~(1<<MISO_PIN); //-> automatically configured according to Atmel
 	
 	// Outports
-	SPI_REG |= (1<<SCK_PIN) | (1<<MOSI_PIN) | (1<<PB2);
-	DDRD |= (1<<SS_PS2_PIN);
+	SPI_REG |= (1<<SCK_PIN) | (1<<MOSI_PIN) | (1<<SS_PS2_PIN) | (1<<CSN);
 
-    SPI_PORT |= (1<<CSN)  | (1<<PB2);
-    PORTD |= (1<<SS_PS2_PIN);
+    SPI_PORT |= (1<<CSN) | (1<<SS_PS2_PIN);
 }
 
 void spi_ps2_config(){
@@ -81,9 +79,9 @@ void radio_ss_high(){
 }
 
 void ps2_ss_low(){
-	PORTD &= ~(1<<SS_PS2_PIN);
+	SPI_PORT &= ~(1<<SS_PS2_PIN);
 }
 
 void ps2_ss_high(){
-	PORTD |= (1<<SS_PS2_PIN);
+	SPI_PORT |= (1<<SS_PS2_PIN);
 }

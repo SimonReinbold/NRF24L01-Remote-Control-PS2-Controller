@@ -20,8 +20,6 @@ uint8_t ps2_data[9];
 int main(void)
 {
     uint8_t payload[PAYLOAD_WIDTH];     //Array for Payload
-    uint8_t maincounter =0;
-    uint8_t k;
 
     lcd_init();
     radio_hardware_init();
@@ -34,8 +32,7 @@ int main(void)
     EIMSK  = ((0<<INT1)|(1<<INT0)); 
     sei();                    // turn on interrupts
 
-    DDRD |= (1<<PD3);
-    DDRC |= (1<<PC5);
+    DDRC |= (1<<PC5) | (1<<PC4);
 
     radio_conf_tx();
     uint8_t cnt = 0;
@@ -60,9 +57,9 @@ int main(void)
                     checkStatus();
 
                     //display(&cnt,1,1);
-                    PORTD |= (1<<PD3);
+                    PORTC |= (1<<PC4);
                     send_radio_msg(ps2_data);
-                    PORTD &= ~(1<<PD3);
+                    PORTC &= ~(1<<PC4);
                     _delay_ms(10);
                 }
                 PORTC &= ~(1<<PC5);

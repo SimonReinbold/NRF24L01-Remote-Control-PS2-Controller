@@ -12,7 +12,7 @@
 #include "lcd-routines.h"
 
 void radio_hardware_init(){
-	RADIO_REG |= ((1<<CE)|(1<<CSN));
+	RADIO_REG |= (1<<CE);
     ce_low();		
 }
 
@@ -117,16 +117,4 @@ uint8_t radio_get_status(){
 	uint8_t stat;
 	stat = SPI_Put(NOP);
 	return stat;
-}
-
-extern uint8_t wl_module_data_ready() 
-// Checks if data is available for reading
-{
-    if (is_sending) return 0;
-    uint8_t status;
-    // Read wl_module status 
-    wl_module_CSN_lo;                                // Pull down chip select
-    status = SPI_Put(NOP);               // Read status register
-    wl_module_CSN_hi;                                // Pull up chip select
-    return status & (1<<RX_DR);
 }

@@ -7,14 +7,9 @@
 
 // Selected Configurations
 
-#define RADIO_REG DDRB
-#define RADIO_PORT PORTB
-#define CE PB0		// 13
-
-#define wl_module_CSN_hi     PORTB |=  (1<<CSN);
-#define wl_module_CSN_lo     PORTB &= ~(1<<CSN);
-#define wl_module_CE_hi      PORTB |=  (1<<CE);
-#define wl_module_CE_lo      PORTB &= ~(1<<CE);
+#define RADIO_REG DDRC
+#define RADIO_PORT PORTC
+#define CE PC0		// 13
 
 // Define Modes
 #define CONF_RX ( (1<<EN_CRC) | (1<<CRCO) )
