@@ -7,7 +7,6 @@
 #define _READOUT_H_
 
 void init_hardware( void );
-void ps2_setup();
-void ps2_poll();
+void checkStatus(void);
 
 #endif /* _READOUT_H_ */

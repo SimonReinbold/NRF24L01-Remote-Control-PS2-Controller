@@ -26,6 +26,7 @@ unsigned char redMode_cmd[9] = {0x01,0x42,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 int main(){
 
 	lcd_init();
+	lcd_string("START");
 	radio_hardware_init();
 
 	EICRA = (1<<ISC01)|(0<<ISC00);	// Set external interupt on falling edge for INT0 and INT1
@@ -35,9 +36,10 @@ int main(){
     spi_init();
 	spi_radio_config();	
 
+	DDRD |= (1<<PD3);
+
     _delay_ms(50);
 	sei();
-	//DDRD |= (1<<PD3);
 
 	radio_conf_rx();
 	new_data_FLG = 0;
@@ -54,6 +56,7 @@ int main(){
 			}else{
 				PORTD &= ~(1<<PD3);
 			}
+			display(payload,PAYLOAD_WIDTH,2);
 /*
 			strncpy(ps2_data,payload,9);
 			if(ps2_x_pressed()){
@@ -68,6 +71,17 @@ int main(){
 		
     }
 }	
+
+void checkStatus(){
+	uint8_t stat;
+	stat = radio_get_status();
+
+	// Check which bit is set
+	if(stat & (1<<RX_DR)){
+		// New Data received
+		new_data_FLG = 1;
+	}
+}
 
 // Called if transmission successful, message received or transmission counter full
 ISR(INT0_vect){

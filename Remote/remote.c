@@ -11,6 +11,7 @@
 #include "../common/radio.h"
 #include "../common/lcd-routines.h"
 #include "../Receiver/ps.h"
+#include "remote.h"
 
 volatile uint8_t timercounter;
 unsigned char redMode_cmd[9] = {0x01,0x42,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -34,6 +35,7 @@ int main(void)
     sei();                    // turn on interrupts
 
     DDRD |= (1<<PD3);
+    DDRC |= (1<<PC5);
 
     radio_conf_tx();
     uint8_t cnt = 0;
@@ -52,15 +54,55 @@ int main(void)
                 }else{
                     PORTD &= ~(1<<PD3);
                 }*/
+                PORTC |= (1<<PC5);
+                if(ps2_data[0] == 0xFF && ps2_data[2]==0x5A){
+                    
+                    checkStatus();
 
-                //display(&cnt,1,1);
-                PORTD |= (1<<PD3);
-                send_radio_msg(ps2_data);
-                PORTD &= ~(1<<PD3);
-                _delay_ms(10);
+                    //display(&cnt,1,1);
+                    PORTD |= (1<<PD3);
+                    send_radio_msg(ps2_data);
+                    PORTD &= ~(1<<PD3);
+                    _delay_ms(10);
+                }
+                PORTC &= ~(1<<PC5);
     }
 }
 
+void checkStatus(){
+    uint8_t status;   
+        // Read wl_module status 
+
+        radio_ss_low();                               // Pull down chip select
+        status = SPI_Put(NOP);                  // Read status register
+        radio_ss_high();                               // Pull up chip select
+        
+        if (status & (1<<TX_DS))                            // IRQ: Package has been sent
+        {
+            radio_config_register(STATUS, (1<<TX_DS));  //Clear Interrupt Bit
+            is_sending=0;
+        }
+        
+        if (status & (1<<MAX_RT))                           // IRQ: Package has not been sent, send again
+        {
+            
+            radio_config_register(STATUS, (1<<MAX_RT)); // Clear Interrupt Bit
+            ce_high();                                // Start transmission
+            _delay_us(10);                              
+            ce_low();
+            is_sending=0;
+        }
+        
+        if (status & (1<<TX_FULL))                          //TX_FIFO Full <-- this is not an IRQ
+        {
+            radio_ss_low();                               // Pull down chip select
+            SPI_Put(FLUSH_TX);                      // Flush TX-FIFO
+            radio_ss_high();                               // Pull up chip select
+            is_sending=0;
+        }
+}
+
+// Disabled due to voltage problems on IRQ Pin
 ISR(INT0_vect){
     uint8_t status;   
         // Read wl_module status 
